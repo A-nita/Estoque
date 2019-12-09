@@ -16,8 +16,8 @@ void limparTela();
 void baixarEstoque(Produto *estoque, int *nCadastros);
 
 void cadastrar(Produto *estoque, int* nCadastros, int *alocado, int *id);
-int compID(void *a, void *b);
-int compNome(void *a, void *b);
+int compID(const void *a, const void *b);
+int compNome(const void *a, const void *b);
 void pesquisar();
 void alterar();
 void deletaProduto(Produto *estoque, int *nCadastros);
@@ -64,7 +64,7 @@ int main(){
             break;
         case 2:
             //nao funfa
-            baixarEstoque(estoque, nCadastros);
+            baixarEstoque(estoque, &nCadastros);
 
             break;
         case 3:
@@ -101,6 +101,18 @@ int main(){
 
 
 
+int compID(const void *a, const void *b){
+    Produto *x = (Produto*) a;
+    Produto *y = (Produto*) b;
+    return x->codigo - y->codigo;
+}
+
+int compNome(const void *a, const void *b){
+    Produto *x = (Produto*) a;
+    Produto *y = (Produto*) b;
+    
+    return strcmp(x->nome, y->nome);
+}
 
 void limparTela(){
 
@@ -130,7 +142,7 @@ void cadastrar(Produto *estoque, int* nCadastros, int *alocado, int *id){
     char nome[TAM_NOME];
 
     printf("Digite o nome do produto:\n");
-    scanf("%s",&nome );
+    scanf("%s", nome);
     strcpy(estoque[*nCadastros].nome, nome);
 
     printf("Nome Est: %s\n", estoque[*nCadastros].nome);
@@ -146,7 +158,7 @@ void cadastrar(Produto *estoque, int* nCadastros, int *alocado, int *id){
     (*nCadastros)++;
     (*id)++;
     limparTela();
-    return estoque;
+    return;
         
 }
 
@@ -166,7 +178,7 @@ Produto *abrirArquivo(int* nCadastros, int*alocado, int *id){
         fread(nCadastros, sizeof(int), 1, file);
         *alocado = (*nCadastros) * 2; 
         *id =  estoque[*nCadastros].codigo;
-        printf("cod = %d", &estoque[*nCadastros].codigo);
+        printf("cod = %d", estoque[*nCadastros].codigo);
 
         Produto *estoque = (Produto*) malloc(sizeof(Produto) * (*alocado));
 
@@ -193,17 +205,17 @@ void salvarArquivo(Produto *estoque, int nCadastros){
 // O problema está aqui, acho que vou precisar refazer a função
 void baixarEstoque(Produto *estoque, int *nCadastros){
     int qtdBaixa;
-    char id;
+    int id;
     
     printf("Digite o codigo do produto que deseja dar baixa: \n");
     scanf("%d", &id);
-    
-    Produto *pVetor = (Produto*) bsearch(id, estoque, nCadastros, sizeof(Produto), compID);
+
+    Produto *pVetor = (Produto*) bsearch(&id, estoque, *nCadastros, sizeof(Produto), compID);
     
     if(pVetor){
         printf("Quantas unidades deseja dar baixa?\n");
         scanf("%d",&qtdBaixa);
-        printf("end pvetor  : %d", pVetor);
+        printf("end pvetor  : %d", pVetor->codigo);
         if(pVetor->qtd - qtdBaixa <= 0)
             printf("Quantidade nao suportada. Estoque ficara negativo\n");
         else
@@ -214,12 +226,6 @@ void baixarEstoque(Produto *estoque, int *nCadastros){
         printf("Produto nao encontrado\n");
     }
     
-}
-
-int compID(void *a, void *b){
-    Produto *x = (Produto*) a;
-    Produto *y = (Produto*) b;
-    return x->codigo - y->codigo;
 }
 
 void exibirEstoque(Produto *estoque, int nCadastros){
@@ -241,12 +247,7 @@ void listarNome(Produto *estoque, int nCadastros){
     exibirEstoque(estoque, nCadastros);
 }
 
-int compNome(void *a, void *b){
-    Produto *x = (Produto*) a;
-    Produto *y = (Produto*) b;
-    
-    return strcmp(x->nome, y->nome);
-}
+
 // void deletaProduto(Produto *estoque, int *nCadastros){
 
 //     char nome[TAM_NOME];
