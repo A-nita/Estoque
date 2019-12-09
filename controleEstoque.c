@@ -14,7 +14,7 @@ typedef struct{
 void limparTela();
 
 void baixarEstoque(Produto *estoque, int *nCadastros);
-
+void entradaEstoque(Produto *estoque, int *nCadastros);
 void cadastrar(Produto *estoque, int* nCadastros, int *alocado, int *id);
 int compID(const void *a, const void *b);
 int compNome(const void *a, const void *b);
@@ -60,10 +60,9 @@ int main(){
         switch (opMenu)
         {
         case 1:
-            //mesma funcao que baixar estoque, só mudar subtração pela soma praticamente
+            entradaEstoque(estoque, &nCadastros);
             break;
         case 2:
-            //nao funfa
             baixarEstoque(estoque, &nCadastros);
 
             break;
@@ -227,6 +226,27 @@ void baixarEstoque(Produto *estoque, int *nCadastros){
     }
     
 }
+void entradaEstoque(Produto *estoque, int *nCadastros){
+    int qtdEntrada;
+    int id;
+    
+    printf("Digite o codigo do produto que deseja dar baixa: \n");
+    scanf("%d", &id);
+
+    Produto *pVetor = (Produto*) bsearch(&id, estoque, *nCadastros, sizeof(Produto), compID);
+    
+    if(pVetor){
+        printf("Quantas unidades deseja dar entrada?\n");
+        scanf("%d",&qtdEntrada);
+        printf("end pvetor  : %d", pVetor->codigo);
+        pVetor->qtd += qtdEntrada;
+    }
+    else
+    {
+        printf("Produto nao encontrado\n");
+    }
+    
+}
 
 void exibirEstoque(Produto *estoque, int nCadastros){
     for (int i = 0; i < nCadastros; i++)
@@ -265,25 +285,3 @@ void listarNome(Produto *estoque, int nCadastros){
 // }
 
 
-
-
-// void apagaContato (Contato *agenda, int *n){
-	
-// 	  char nome[100];
-//       int j, i;
-//       flush_in();
-//       printf("Digite o nome a ser removido: ");
-//       gets(nome);
-//       for(i=0; i < *n; i++){
-//              if (strcmp(agenda[i].nome, nome)==0){
-//              	for(j=i+1; j < *n; j++){
-//                          strcpy(agenda[j-1].nome,agenda[j].nome);
-//                          agenda[j-1].telefone=agenda[j].telefone;
-//                  }
-//                 (*n) --;
-//                 i  = *n;
-//               }
-//       }
-    
-    
-// }
