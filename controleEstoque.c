@@ -20,7 +20,7 @@ int compID(void *a, void *b);
 int compNome(void *a, void *b);
 void pesquisar();
 void alterar();
-void excluir();
+void deletaProduto(Produto *estoque, int *nCadastros);
 void listarNome(Produto *estoque, int nCadastros);
 void listarId(Produto *estoque, int nCadastros);
 Produto *abrirArquivo(int* nCadastros, int*alocado, int *id);
@@ -60,22 +60,24 @@ int main(){
         switch (opMenu)
         {
         case 1:
-            /* code */
+            //mesma funcao que baixar estoque, só mudar subtração pela soma praticamente
             break;
         case 2:
+            //nao funfa
             baixarEstoque(estoque, nCadastros);
+
             break;
         case 3:
              cadastrar(estoque, &nCadastros, &alocado, &id);
             break;
         case 4:
-            /* code */
+            /* Pesquisar Produto*/
             break;
         case 5:
-            /* code */
+            /* alterar Produto */
             break;
         case 6:
-            /* code */
+            /* excluir Produto */
             break;
         case 7:
             listarId(estoque, nCadastros);            
@@ -188,23 +190,24 @@ void salvarArquivo(Produto *estoque, int nCadastros){
     fclose(file);
 }
 
+// O problema está aqui, acho que vou precisar refazer a função
 void baixarEstoque(Produto *estoque, int *nCadastros){
     int qtdBaixa;
     char id;
-    int pVetor = -1;
+    
     printf("Digite o codigo do produto que deseja dar baixa: \n");
     scanf("%d", &id);
-    qsort(estoque, nCadastros,  sizeof(Produto), compID);
-
-    pVetor = bsearch(id, estoque, nCadastros, sizeof(Produto), compID);
     
-    if(pVetor != -1){
+    Produto *pVetor = (Produto*) bsearch(id, estoque, nCadastros, sizeof(Produto), compID);
+    
+    if(pVetor){
         printf("Quantas unidades deseja dar baixa?\n");
         scanf("%d",&qtdBaixa);
-        if(estoque[pVetor].qtd - qtdBaixa <= 0)
+        printf("end pvetor  : %d", pVetor);
+        if(pVetor->qtd - qtdBaixa <= 0)
             printf("Quantidade nao suportada. Estoque ficara negativo\n");
         else
-            estoque[pVetor].qtd -= qtdBaixa;
+            pVetor->qtd -= qtdBaixa;
     }
     else
     {
@@ -244,3 +247,42 @@ int compNome(void *a, void *b){
     
     return strcmp(x->nome, y->nome);
 }
+// void deletaProduto(Produto *estoque, int *nCadastros){
+
+//     char nome[TAM_NOME];
+//     printf("Digite o nome do produto a ser removido: \n");
+//     scanf("%s", &nome);
+//     for (int i = 0; i < nCadastros; i++)
+//     {
+//         for (int j = 0; j < nCadastros; j++)
+//         {
+//             /* code */
+//         }
+        
+//     }
+    
+// }
+
+
+
+
+// void apagaContato (Contato *agenda, int *n){
+	
+// 	  char nome[100];
+//       int j, i;
+//       flush_in();
+//       printf("Digite o nome a ser removido: ");
+//       gets(nome);
+//       for(i=0; i < *n; i++){
+//              if (strcmp(agenda[i].nome, nome)==0){
+//              	for(j=i+1; j < *n; j++){
+//                          strcpy(agenda[j-1].nome,agenda[j].nome);
+//                          agenda[j-1].telefone=agenda[j].telefone;
+//                  }
+//                 (*n) --;
+//                 i  = *n;
+//               }
+//       }
+    
+    
+// }
