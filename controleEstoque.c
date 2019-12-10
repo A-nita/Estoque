@@ -1,3 +1,12 @@
+/* ==========================================================================
+ * FATEC - Sorocaba
+ * Disciplina: Linguagem de Programação 1
+ * Prof. Glauco Todesco
+ * Trabalho de COntrole de Estoque
+ * RA: 0030481911028
+ * Aluno: Maria Anita de Moura
+ * ========================================================================== */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -15,6 +24,7 @@
 #endif
 
 #define TAM_NOME 50
+#define NOME_ARQUIVO "controleEstoque.dat"
 
 typedef struct{
     int codigo;
@@ -38,7 +48,7 @@ void exibiProduto(Produto* p);
 void deletaProduto(Produto *estoque, int *nCadastros);
 void listarNome(Produto *estoque, int nCadastros);
 void listarId(Produto *estoque, int nCadastros);
-Produto *abrirArquivo(int* nCadastros, int*alocado, int *id);
+Produto *abrirArquivo(int* nCadastros, int*alocado);
 void salvarArquivo(Produto *estoque, int nCadastros);
 void exibirEstoque(Produto *estoque, int nCadastros);
 void sair();
@@ -52,7 +62,8 @@ int main(){
     Produto *estoque;
     int opMenu = 8;
 
-    estoque = abrirArquivo(&nCadastros, &alocado, &id);
+    estoque = abrirArquivo(&nCadastros, &alocado);
+    id = estoque[nCadastros-1].codigo;
 
     do
     {
@@ -183,25 +194,27 @@ void cadastrar(Produto *estoque, int* nCadastros, int *alocado, int *id){
     return;        
 }
 
-Produto *abrirArquivo(int* nCadastros, int*alocado, int *id){
+Produto *abrirArquivo(int* nCadastros, int*alocado){
 
     Produto *estoque;    
-    FILE *file = fopen("estoque.dat","r");
+    FILE *file = fopen(NOME_ARQUIVO,"r");
 
     if(file==NULL){
         *nCadastros = 0;
         *alocado = 20;
-        *id = 0;
+        
 
         estoque = (Produto*) malloc(sizeof(Produto) * (*alocado));
     }
     else{
         fread(nCadastros, sizeof(int), 1, file);
-        *alocado = (*nCadastros) * 2; 
-        *id =  estoque[(*nCadastros)--].codigo;
-        printf("cod = %d", estoque[(*nCadastros)--].codigo);
 
-        Produto *estoque = (Produto*) malloc(sizeof(Produto) * (*alocado));
+        *alocado = (*nCadastros) * 2; 
+        
+        // printf("cod = %d", estoque[(*nCadastros)-1].codigo);
+
+        estoque = (Produto*) malloc(sizeof(Produto) * (*alocado));
+        //*id =  estoque[(*nCadastros)-1].codigo;
 
         fread(estoque, sizeof(Produto), *nCadastros, file);
         fclose(file);
@@ -212,7 +225,7 @@ Produto *abrirArquivo(int* nCadastros, int*alocado, int *id){
  
 void salvarArquivo(Produto *estoque, int nCadastros){
 
-    FILE *file = fopen("estoque.dat", "w");
+    FILE *file = fopen(NOME_ARQUIVO, "w");
 
     fwrite(&nCadastros, sizeof(int), 1, file);
 
@@ -328,7 +341,7 @@ void deletaProduto(Produto *estoque, int *nCadastros){
         int i = 0;          
         while(pVetor[i].codigo != estoque[(*nCadastros) - 1].codigo)             
         {   
-            printf(" i = %d", i);
+            
             pVetor[i].codigo = pVetor[i+1].codigo;
             strcpy(pVetor[i].nome, pVetor[i+1].nome);
             pVetor[i].qtd = pVetor[i+1].qtd;
