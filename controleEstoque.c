@@ -336,9 +336,7 @@ void deletaProduto(Produto *estoque, int *nCadastros){
     scanf("%d", &id);
 
     Produto *pVetor = (Produto*) bsearch(&id, estoque, *nCadastros, sizeof(Produto), compID);
-
-    exibiProduto(pVetor);
-
+    
     if(pVetor){
         int i = 0;          
         while(pVetor[i].codigo != estoque[(*nCadastros) - 1].codigo)             
@@ -349,8 +347,8 @@ void deletaProduto(Produto *estoque, int *nCadastros){
             pVetor[i].qtd = pVetor[i+1].qtd;
             i++;
         }    
-        (*nCadastros)--;
-
+        (*nCadastros)-1;
+        exibiProduto(pVetor);
     }
     else{
         printf("Produto nao encontrado\n");
@@ -397,8 +395,14 @@ void pesquisarProduto(Produto *estoque, int *nCadastros){
     scanf("%d", &id);
 
     Produto *pVetor = (Produto*) bsearch(&id, estoque, *nCadastros, sizeof(Produto), compID);
+    if(pVetor){
+        exibiProduto(pVetor);
+    }
+    else{
+        printf("Produto nao encontrado");
+    }
 
-    exibiProduto(pVetor);
+    
     sair();
 }
 
