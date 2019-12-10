@@ -2,6 +2,18 @@
 #include <string.h>
 #include <stdlib.h>
 
+#ifdef __unix__         
+    #include <unistd.h>
+    #include <stdlib.h>
+
+#elif defined(_WIN32) || defined(WIN32) 
+
+   #define OS_Windows
+
+   #include <windows.h>
+
+#endif
+
 #define TAM_NOME 50
 
 typedef struct{
@@ -18,17 +30,18 @@ void entradaEstoque(Produto *estoque, int *nCadastros);
 void cadastrar(Produto *estoque, int* nCadastros, int *alocado, int *id);
 int compID(const void *a, const void *b);
 int compNome(const void *a, const void *b);
-void pesquisar();
-void alterar();
+void pesquisarProduto(Produto *estoque, int *nCadastros);
+
+void alterarProduto(Produto *estoque, int *nCadastros);
+
 void exibiProduto(Produto* p);
-
 void deletaProduto(Produto *estoque, int *nCadastros);
-
 void listarNome(Produto *estoque, int nCadastros);
 void listarId(Produto *estoque, int nCadastros);
 Produto *abrirArquivo(int* nCadastros, int*alocado, int *id);
 void salvarArquivo(Produto *estoque, int nCadastros);
 void exibirEstoque(Produto *estoque, int nCadastros);
+void sair();
 
 
 
@@ -40,12 +53,11 @@ int main(){
     int opMenu = 8;
 
     estoque = abrirArquivo(&nCadastros, &alocado, &id);
-    
-
 
     do
     {
-       printf("\n################Controle de Estoque################");
+        limparTela();
+        printf("\n\t\tControle de Estoque\t\t\n\n");
 
         printf("\n Entrada de Estoque         1\n");
         printf("\n Saida de Estoque           2\n");
@@ -57,38 +69,45 @@ int main(){
         printf("\n Listar Produtos por nome   8\n");
        printf("\n Sair                       9\n");
 
-       printf("Digite uma opcao : \n");
+       printf("\nDigite uma opcao : \n");
        scanf("%d", &opMenu);
-       //limparTela();
+       
         switch (opMenu)
         {
         case 1:
+            limparTela();
             entradaEstoque(estoque, &nCadastros);
             break;
         case 2:
+            limparTela();
             baixarEstoque(estoque, &nCadastros);
             break;
         case 3:
-             cadastrar(estoque, &nCadastros, &alocado, &id);
+            limparTela();
+            cadastrar(estoque, &nCadastros, &alocado, &id);
             break;
         case 4:
-            /* Pesquisar Produto*/
+            limparTela();
+            pesquisarProduto(estoque, &nCadastros);
             break;
         case 5:
-            /* alterar Produto */
+            limparTela();
+            alterarProduto(estoque, &nCadastros);
             break;
         case 6:
+            limparTela();
             deletaProduto(estoque, &nCadastros);
             break;
         case 7:
+            limparTela();
             listarId(estoque, nCadastros);            
             break;
         case 8:
+            limparTela();
             listarNome(estoque, nCadastros);            
             break;
         }
-        // limparTela();
-
+        
     } while (opMenu != 9);  
 
     salvarArquivo(estoque, nCadastros);
@@ -116,11 +135,13 @@ int compNome(const void *a, const void *b){
 }
 
 void limparTela(){
-
-    for (int i = 0; i < 15; i++)
-    {
-        printf("\n");
-    }    
+        #ifdef OS_Windows
+    
+        system("cls");
+    #else
+    
+        system("clear");
+    #endif  
 }
 
 void cadastrar(Produto *estoque, int* nCadastros, int *alocado, int *id){    
@@ -146,21 +167,19 @@ void cadastrar(Produto *estoque, int* nCadastros, int *alocado, int *id){
     scanf("%s", nome);
     strcpy(estoque[*nCadastros].nome, nome);
 
-    printf("Nome Est: %s\n", estoque[*nCadastros].nome);
     printf("Digite a quantidade do produto em estoque: \n");
 
     scanf("%d", &estoque[*nCadastros].qtd);
-    estoque[*nCadastros].codigo = (*id) + 1;    
-    
-    printf("estoque[*nCadastros].nome: %s\n", estoque[*nCadastros].nome);
-    printf("estoque[*nCadastros].qtd: %d\n", estoque[*nCadastros].qtd);
-    printf("estoque[*nCadastros].codigo: %d\n", estoque[*nCadastros].codigo);
+    estoque[*nCadastros].codigo = (*id) + 1;  
 
+    limparTela();
+    exibiProduto(&estoque[(*nCadastros)]);
+    
     (*nCadastros)++;
     (*id)++;
-    limparTela();
-    return;
-        
+
+    sair();
+    return;        
 }
 
 Produto *abrirArquivo(int* nCadastros, int*alocado, int *id){
@@ -178,8 +197,8 @@ Produto *abrirArquivo(int* nCadastros, int*alocado, int *id){
     else{
         fread(nCadastros, sizeof(int), 1, file);
         *alocado = (*nCadastros) * 2; 
-        *id =  estoque[*nCadastros].codigo;
-        printf("cod = %d", estoque[*nCadastros].codigo);
+        *id =  estoque[(*nCadastros)--].codigo;
+        printf("cod = %d", estoque[(*nCadastros)--].codigo);
 
         Produto *estoque = (Produto*) malloc(sizeof(Produto) * (*alocado));
 
@@ -212,41 +231,54 @@ void baixarEstoque(Produto *estoque, int *nCadastros){
 
     Produto *pVetor = (Produto*) bsearch(&id, estoque, *nCadastros, sizeof(Produto), compID);
     
+    
     if(pVetor){
+        exibiProduto(pVetor);
+
         printf("Quantas unidades deseja dar baixa?\n");
         scanf("%d",&qtdBaixa);
-        printf("end pvetor  : %d", pVetor->codigo);
+        
 
         if(pVetor->qtd - qtdBaixa <= 0)
-            printf("Quantidade nao suportada. Estoque ficara negativo\n");
+            printf("\nQuantidade nao suportada. Estoque ficara negativo\n");
         else
             pVetor->qtd -= qtdBaixa;
+            
+            limparTela();
+            exibiProduto(pVetor);
     }
     else
     {
         printf("Produto nao encontrado\n");
     }    
+
+    sair();
 }
 
 void entradaEstoque(Produto *estoque, int *nCadastros){
     int qtdEntrada;
     int id;
     
-    printf("Digite o codigo do produto que deseja dar baixa: \n");
+    printf("Digite o codigo do produto que deseja dar entrada: \n");
     scanf("%d", &id);
 
     Produto *pVetor = (Produto*) bsearch(&id, estoque, *nCadastros, sizeof(Produto), compID);
     
     if(pVetor){
+        exibiProduto(pVetor);
         printf("Quantas unidades deseja dar entrada?\n");
         scanf("%d",&qtdEntrada);
-        printf("end pvetor  : %d", pVetor->codigo);
         pVetor->qtd += qtdEntrada;
+
+        limparTela();
+        exibiProduto(pVetor);
     }
     else
     {
         printf("Produto nao encontrado\n");
     }
+
+    sair();
     
 }
 
@@ -257,22 +289,26 @@ void exibirEstoque(Produto *estoque, int nCadastros){
         printf("Quantidade em Estoque: %d\n", estoque[i].qtd);
         printf("Codigo do produto: %d\n\n\n", estoque[i].codigo);
     }
+
 }
 
 void listarId(Produto *estoque, int nCadastros){
     qsort(estoque, nCadastros, sizeof(Produto), compID);
     exibirEstoque(estoque, nCadastros);
+
+    sair();
 }
 
 void listarNome(Produto *estoque, int nCadastros){
     qsort(estoque, nCadastros, sizeof(Produto), compNome);
     exibirEstoque(estoque, nCadastros);
+
+    sair();
 }
 
 void deletaProduto(Produto *estoque, int *nCadastros){
     
-    int id;
-    
+    int id;    
     
     printf("Digite o codigo do produto que deseja excluir: \n");
     scanf("%d", &id);
@@ -280,8 +316,6 @@ void deletaProduto(Produto *estoque, int *nCadastros){
     Produto *pVetor = (Produto*) bsearch(&id, estoque, *nCadastros, sizeof(Produto), compID);
 
     exibiProduto(pVetor);
-
-
 
     if(pVetor){
         int i = 0;          
@@ -300,11 +334,52 @@ void deletaProduto(Produto *estoque, int *nCadastros){
         printf("Produto nao encontrado\n");
     }
 
+    sair();
 }
 
 void exibiProduto(Produto* p){
     printf("Nome do Produto: %s\n", p->nome);
     printf("Quantidade em Estoque: %d\n", p->qtd);
-    printf("Codigo do produto: %d\n\n\n", p->codigo);
+    printf("Codigo do produto: %d\n\n\n", p->codigo);    
+}
 
+void alterarProduto(Produto *estoque, int *nCadastros){
+    int id;
+    
+    printf("Digite o codigo do produto que deseja alterar o nome: \n");
+    getchar();
+    scanf("%d", &id);
+
+    Produto *pVetor = (Produto*) bsearch(&id, estoque, *nCadastros, sizeof(Produto), compID);
+    if(pVetor){
+        exibiProduto(pVetor);
+        char nome[TAM_NOME];
+        printf("Digite o novo nome do produto: \n");
+        scanf("%s", nome);
+        strcpy(pVetor->nome, nome);
+        printf("Novo nome: %s\n", pVetor->nome);
+    }
+    else{
+        printf("Produto nao encontrado\n");
+    }
+}
+
+void pesquisarProduto(Produto *estoque, int *nCadastros){
+    
+    int id;    
+    
+    printf("Digite o codigo do produto que deseja pesquisar: \n");
+    scanf("%d", &id);
+
+    Produto *pVetor = (Produto*) bsearch(&id, estoque, *nCadastros, sizeof(Produto), compID);
+
+    exibiProduto(pVetor);
+    sair();
+}
+
+void sair(){
+    char sair;
+    printf("\nPressione algum botao para sair\n");
+    getchar();
+    scanf("%c", &sair);
 }
