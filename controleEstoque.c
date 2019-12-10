@@ -48,7 +48,7 @@ void exibiProduto(Produto* p);
 void deletaProduto(Produto *estoque, int *nCadastros);
 void listarNome(Produto *estoque, int nCadastros);
 void listarId(Produto *estoque, int nCadastros);
-Produto *abrirArquivo(int* nCadastros, int*alocado);
+Produto *abrirArquivo(int* nCadastros, int*alocado, int *id);
 void salvarArquivo(Produto *estoque, int nCadastros);
 void exibirEstoque(Produto *estoque, int nCadastros);
 void sair();
@@ -62,8 +62,8 @@ int main(){
     Produto *estoque;
     int opMenu = 8;
 
-    estoque = abrirArquivo(&nCadastros, &alocado);
-    id = estoque[nCadastros-1].codigo;
+    estoque = abrirArquivo(&nCadastros, &alocado, &id);
+    
 
     do
     {
@@ -78,7 +78,7 @@ int main(){
         printf("\n Excluir Produto            6\n");
         printf("\n Listar Produtos por Id     7\n");
         printf("\n Listar Produtos por nome   8\n");
-       printf("\n Sair                       9\n");
+       printf("\n Salvar e Sair               9\n");
 
        printf("\nDigite uma opcao : \n");
        scanf("%d", &opMenu);
@@ -194,7 +194,7 @@ void cadastrar(Produto *estoque, int* nCadastros, int *alocado, int *id){
     return;        
 }
 
-Produto *abrirArquivo(int* nCadastros, int*alocado){
+Produto *abrirArquivo(int* nCadastros, int*alocado, int *id){
 
     Produto *estoque;    
     FILE *file = fopen(NOME_ARQUIVO,"r");
@@ -209,14 +209,14 @@ Produto *abrirArquivo(int* nCadastros, int*alocado){
     else{
         fread(nCadastros, sizeof(int), 1, file);
 
-        *alocado = (*nCadastros) * 2; 
-        
-        // printf("cod = %d", estoque[(*nCadastros)-1].codigo);
+        *alocado = (*nCadastros) * 2;       
 
         estoque = (Produto*) malloc(sizeof(Produto) * (*alocado));
-        //*id =  estoque[(*nCadastros)-1].codigo;
-
+                
         fread(estoque, sizeof(Produto), *nCadastros, file);
+
+        *id =  estoque[(*nCadastros)-1].codigo;
+        
         fclose(file);
     }
 
@@ -224,6 +224,8 @@ Produto *abrirArquivo(int* nCadastros, int*alocado){
 }
  
 void salvarArquivo(Produto *estoque, int nCadastros){
+    
+    qsort(estoque, nCadastros, sizeof(Produto), compID);
 
     FILE *file = fopen(NOME_ARQUIVO, "w");
 
