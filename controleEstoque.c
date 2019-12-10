@@ -57,7 +57,7 @@ int main(){
     do
     {
         limparTela();
-        printf("\n\t\tControle de Estoque\t\t\n\n");
+        printf("\n\t\tControle de Estoque\n\n");
 
         printf("\n Entrada de Estoque         1\n");
         printf("\n Saida de Estoque           2\n");
@@ -145,6 +145,7 @@ void limparTela(){
 }
 
 void cadastrar(Produto *estoque, int* nCadastros, int *alocado, int *id){    
+    printf("\n\t CADASTRAR NOVO PRODUTO\n\n");
       
     if(*nCadastros == *alocado){
         Produto* novoEstoque;
@@ -223,6 +224,7 @@ void salvarArquivo(Produto *estoque, int nCadastros){
 }
 
 void baixarEstoque(Produto *estoque, int *nCadastros){
+    printf("\n\t BAIXA DE ESTOQUE\n\n");
     int qtdBaixa;
     int id;
     
@@ -243,7 +245,7 @@ void baixarEstoque(Produto *estoque, int *nCadastros){
             printf("\nQuantidade nao suportada. Estoque ficara negativo\n");
         else
             pVetor->qtd -= qtdBaixa;
-            
+
             limparTela();
             exibiProduto(pVetor);
     }
@@ -256,6 +258,7 @@ void baixarEstoque(Produto *estoque, int *nCadastros){
 }
 
 void entradaEstoque(Produto *estoque, int *nCadastros){
+    printf("\n\t ENTRADA DE ESTOQUE\n\n");
     int qtdEntrada;
     int id;
     
@@ -293,6 +296,7 @@ void exibirEstoque(Produto *estoque, int nCadastros){
 }
 
 void listarId(Produto *estoque, int nCadastros){
+    printf("\n\t LISTAR PRODUTOS POR ID\n\n");
     qsort(estoque, nCadastros, sizeof(Produto), compID);
     exibirEstoque(estoque, nCadastros);
 
@@ -300,6 +304,7 @@ void listarId(Produto *estoque, int nCadastros){
 }
 
 void listarNome(Produto *estoque, int nCadastros){
+    printf("\n\t LISTAR PRODUTOS POR NOME\n\n");
     qsort(estoque, nCadastros, sizeof(Produto), compNome);
     exibirEstoque(estoque, nCadastros);
 
@@ -307,6 +312,8 @@ void listarNome(Produto *estoque, int nCadastros){
 }
 
 void deletaProduto(Produto *estoque, int *nCadastros){
+
+    printf("\n\t EXCLUIR PRODUTO\n\n");
     
     int id;    
     
@@ -338,12 +345,14 @@ void deletaProduto(Produto *estoque, int *nCadastros){
 }
 
 void exibiProduto(Produto* p){
+    printf("\n\t EXIBIR PRODUTO\n\n");
     printf("Nome do Produto: %s\n", p->nome);
     printf("Quantidade em Estoque: %d\n", p->qtd);
     printf("Codigo do produto: %d\n\n\n", p->codigo);    
 }
 
 void alterarProduto(Produto *estoque, int *nCadastros){
+    printf("\n\t ALTERAR NOME DE PRODUTOS\n\n");
     int id;
     
     printf("Digite o codigo do produto que deseja alterar o nome: \n");
@@ -365,6 +374,7 @@ void alterarProduto(Produto *estoque, int *nCadastros){
 }
 
 void pesquisarProduto(Produto *estoque, int *nCadastros){
+    printf("\n\t PESQUISAR PRODUTO\n\n");
     
     int id;    
     
