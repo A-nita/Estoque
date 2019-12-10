@@ -20,7 +20,10 @@ int compID(const void *a, const void *b);
 int compNome(const void *a, const void *b);
 void pesquisar();
 void alterar();
+void exibiProduto(Produto* p);
+
 void deletaProduto(Produto *estoque, int *nCadastros);
+
 void listarNome(Produto *estoque, int nCadastros);
 void listarId(Produto *estoque, int nCadastros);
 Produto *abrirArquivo(int* nCadastros, int*alocado, int *id);
@@ -64,7 +67,6 @@ int main(){
             break;
         case 2:
             baixarEstoque(estoque, &nCadastros);
-
             break;
         case 3:
              cadastrar(estoque, &nCadastros, &alocado, &id);
@@ -76,7 +78,7 @@ int main(){
             /* alterar Produto */
             break;
         case 6:
-            /* excluir Produto */
+            deletaProduto(estoque, &nCadastros);
             break;
         case 7:
             listarId(estoque, nCadastros);            
@@ -201,7 +203,6 @@ void salvarArquivo(Produto *estoque, int nCadastros){
     fclose(file);
 }
 
-// O problema está aqui, acho que vou precisar refazer a função
 void baixarEstoque(Produto *estoque, int *nCadastros){
     int qtdBaixa;
     int id;
@@ -215,6 +216,7 @@ void baixarEstoque(Produto *estoque, int *nCadastros){
         printf("Quantas unidades deseja dar baixa?\n");
         scanf("%d",&qtdBaixa);
         printf("end pvetor  : %d", pVetor->codigo);
+
         if(pVetor->qtd - qtdBaixa <= 0)
             printf("Quantidade nao suportada. Estoque ficara negativo\n");
         else
@@ -223,9 +225,9 @@ void baixarEstoque(Produto *estoque, int *nCadastros){
     else
     {
         printf("Produto nao encontrado\n");
-    }
-    
+    }    
 }
+
 void entradaEstoque(Produto *estoque, int *nCadastros){
     int qtdEntrada;
     int id;
@@ -251,9 +253,9 @@ void entradaEstoque(Produto *estoque, int *nCadastros){
 void exibirEstoque(Produto *estoque, int nCadastros){
     for (int i = 0; i < nCadastros; i++)
     {
-        printf("estoque[i].nome: %s\n", estoque[i].nome);
-        printf("estoque[i].qtd: %d\n", estoque[i].qtd);
-        printf("estoque[i].codigo: %d\n\n\n", estoque[i].codigo);
+        printf("Nome do Produto: %s\n", estoque[i].nome);
+        printf("Quantidade em Estoque: %d\n", estoque[i].qtd);
+        printf("Codigo do produto: %d\n\n\n", estoque[i].codigo);
     }
 }
 
@@ -267,21 +269,42 @@ void listarNome(Produto *estoque, int nCadastros){
     exibirEstoque(estoque, nCadastros);
 }
 
-
-// void deletaProduto(Produto *estoque, int *nCadastros){
-
-//     char nome[TAM_NOME];
-//     printf("Digite o nome do produto a ser removido: \n");
-//     scanf("%s", &nome);
-//     for (int i = 0; i < nCadastros; i++)
-//     {
-//         for (int j = 0; j < nCadastros; j++)
-//         {
-//             /* code */
-//         }
-        
-//     }
+void deletaProduto(Produto *estoque, int *nCadastros){
     
-// }
+    int id;
+    
+    
+    printf("Digite o codigo do produto que deseja excluir: \n");
+    scanf("%d", &id);
+
+    Produto *pVetor = (Produto*) bsearch(&id, estoque, *nCadastros, sizeof(Produto), compID);
+
+    exibiProduto(pVetor);
 
 
+
+    if(pVetor){
+        int i = 0;          
+        while(pVetor[i].codigo != estoque[(*nCadastros) - 1].codigo)             
+        {   
+            printf(" i = %d", i);
+            pVetor[i].codigo = pVetor[i+1].codigo;
+            strcpy(pVetor[i].nome, pVetor[i+1].nome);
+            pVetor[i].qtd = pVetor[i+1].qtd;
+            i++;
+        }    
+        (*nCadastros)--;
+
+    }
+    else{
+        printf("Produto nao encontrado\n");
+    }
+
+}
+
+void exibiProduto(Produto* p){
+    printf("Nome do Produto: %s\n", p->nome);
+    printf("Quantidade em Estoque: %d\n", p->qtd);
+    printf("Codigo do produto: %d\n\n\n", p->codigo);
+
+}
